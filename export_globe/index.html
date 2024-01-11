@@ -1,0 +1,143 @@
+<html>
+
+	<head>
+		<title>全球主要经济体出口经济复杂度可视化</title>
+		<!--
+			视口元标签：让网页的布局在不同设备上能正确显示
+			此处设置视口宽度等于设备宽度，初始缩放比例是1.0，最大缩放比例是1，且用户不能手动缩放
+		-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+		<!--机器人元标签：告诉搜索引擎的爬虫，这个页面不能被索引，但页面上的链接可以被跟踪-->
+		<META NAME="ROBOTS" CONTENT="NOINDEX, FOLLOW">
+		<!--字符集元标签：定义网页的字符编码为UTF-8-->
+		<meta charset="utf-8">
+		<!--引入外部的CSS样式表-->
+		<link href="csslib/style.css" rel="stylesheet" type="text/css">  <!--HTML元素的样式-->
+		<link href='csslib/Roboto+NotoSansSC.css' rel='stylesheet' type='text/css'>  <!--全局字体（中文：Noto Sans SC，英文：Roboto）-->
+		<link href="csslib/select2.css" rel="stylesheet" type="text/css">  <!--Select2插件的样式-->
+		<!--引入外部的JavaScript文件-->
+		<script src="jslib/extrn/jquery-1.11.3.min.js"></script>  <!--jQuery库-->
+		<script src="jslib/extrn/select2.min.js"></script>  <!--Select2插件库-->
+		<script src="jslib/extrn/three.min.js"></script>  <!--Three.js库-->
+	</head>
+
+	<body>
+
+		<div id="loading">世界贸易出口数据加载中……</div>  <!--加载提示语-->
+		<div id="spinner"></div>  <!--加载圈动画-->
+
+		<!--项目信息与外部链接-->
+		<div class="logobox" style="position: fixed; right: 10px; top: 10px;">
+			<img src="images/whusim_logo.png">
+		</div>
+		<div class="info">
+			项目作者<span class="bull">&bull;</span><a href="link/Zeyu-Deng (Z. D.) · GitHub.html">邓泽宇</a><br/>
+			源代码<span class="bull">&bull;</span><a href="google.com">GitHub仓库</a><br/>
+			技术支持<span class="bull">&bull;</span><a href="link/WebGL Overview - The Khronos Group Inc.html">WebGL</a></span><a href="link/Three.js – JavaScript 3D Library.html">｜Three.js</a><br/>
+			数据支持<span class="bull">&bull;</span><a href="link/The Atlas of Economic Complexity.html">哈佛大学增长实验室</a>
+		</div>
+
+		<!--用户交互元素-->
+		<div id="UI">
+
+			<div id="sideBar">  <!--侧栏-->
+
+				<div class="titlebox">  <!--项目标题，兼初始化按钮-->
+					<div class="title">
+						<span style="font-size:46px">全球</span><br/>
+						<span style="font-size:36px">主要经济体</span><br/>
+						<span style="font-size:42px">出口经济</span><br/>
+						<span style="font-size:32px">复杂度可视化</span><br/>
+					</div>
+				</div>
+
+				<div class="separator">&nbsp;</div>  <!--分隔线-->
+
+				<div class="subtitle">  <!--解释说明-->
+					每一个亮点 代表 一亿美元出口额
+				</div>
+
+				<div class="separator">&nbsp;</div>  <!--分隔线-->
+
+				<div id="countrySection">  <!--经济体选择器-->
+					<div class="selectionBox">  <!--下拉选择框-->
+						<select class="countrySelection"></select>
+					</div>
+				</div>
+
+				<div class="separator">&nbsp;</div>  <!--分隔线-->
+
+				<div id="modes"></div>  <!--视图模式选择器-->
+
+				<div class="separator">&nbsp;</div>  <!--分隔线-->
+
+				<!--显示设置按钮-->
+				<div id="brighter">明&emsp;亮&emsp;模&emsp;式</div>
+				<div id="fullscreen">全&emsp;屏&emsp;模&emsp;式</div>
+				<div id="showLabels">显&emsp;示&emsp;地&emsp;名</div>
+
+				<div class="smallTitle" style="position:absolute;bottom:40px;">
+					按出口商品类别进行筛选
+				</div>
+
+			</div>
+
+		</div>
+
+		<div id="countries" ></div>  <!--国家/地区名称标签-->
+
+		<div id="categories"></div>  <!--商品类别分区标签-->
+
+		<div id="pointer"></div>  <!--亮点提示标签-->
+
+		<div id="modeDescription"></div>  <!--视图按钮提示标签-->
+
+		<!--不支持WebGL提示（只有当浏览器不支持WebGL时才会显示）-->
+		<div id="noWebGL" style="display:none">
+			<div id='description'>
+				The Globe of World Exports dynamically maps out the entire world production of goods to create an economic landscape of countries around the globe.<br/> This project was built with WebGL and needs it to run properly, your current web browser is not compatible.<br/> See <a href='https://get.webgl.org/'>get.webgl.org</a> to fix this issue.
+			</div>
+		</div>
+
+		<!--在WebGL中创建自定义的渲染效果-->
+		<!--顶点着色器-->
+		<script type="x-shader/x-vertex" id="vertexshader">
+			attribute float size;
+			attribute vec3 customColor;
+			varying vec3 vColor;
+			void main() {
+				vColor = customColor;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+				gl_Position = projectionMatrix * mvPosition;
+			}
+		</script>
+		<!--片段着色器-->
+		<script type="x-shader/x-fragment" id="fragmentshader">
+			uniform vec3 color;
+			uniform sampler2D texture;
+			varying vec3 vColor;
+			void main() {
+				gl_FragColor = vec4( color * vColor, 1.0 );
+				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+			}
+		</script>
+
+		<!--实现网页各项交互功能以及数据可视化所需要的JavaScript脚本文件-->
+		<script src="jslib/misc/noWebGL.js"></script>
+		<script src="jslib/misc/spin.js"></script>
+		<script src="jslib/misc/THREE.FullScreen.js"></script>
+		<script src='jslib/misc/THREEx.KeyboardState.js'></script>
+		<script src="jslib/UI.js"></script>
+		<script src="jslib/labels.js"></script>
+		<script src="jslib/countryData.js"></script>
+		<script src="jslib/THREE.GeoJSON.js"></script>
+		<script src="jslib/cameraControls.js"></script>
+		<script src="jslib/ParticleLinks.js"></script>
+		<script src="jslib/URLparser.js"></script>
+		<script src="jslib/extrn/BezierCurve.js"></script>
+		<script src="jslib/main.js"></script>
+
+	</body>
+
+</html>
