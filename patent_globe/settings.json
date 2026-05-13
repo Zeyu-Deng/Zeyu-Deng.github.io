@@ -1,0 +1,85 @@
+{
+  "data": {
+    "sourceDir": "patent_globe/raw_data",
+    "outputDir": "patent_globe/data",
+    "worldFile": "patent_globe/data/world.json",
+    "anchorsFile": "patent_globe/data/anchors.js",
+    "populationDensityLogBase": 10,
+    "patentUnit": 5,
+    "files": {
+      "categoryExplanation": "category_explanation(1).csv",
+      "classExplanation": "class_explanation(1).csv",
+      "patentCounts": "dv_patent_count(1).csv",
+      "patentCitations": "dv_patent_citation.csv",
+      "countryTransfers": "专利申请国_受让人国计数_Sheet1.csv"
+    },
+    "classAliases": {
+      "Y02T1/": "Y02T10",
+      "Y02B21": "Y02B20",
+      "Y02B49": "Y02B40",
+      "Y02E31": "Y02E30"
+    },
+    "classNameOverrides": {
+      "Y02B60": "建筑领域中信息通信技术相关的节能技术",
+      "Y02B80": "提升建筑能源效率的建筑设计、施工或改造技术",
+      "Y02D50": "信息通信技术中用于减少能源消耗的控制或管理技术",
+      "Y02D70": "信息通信技术中具有潜在或间接减排贡献的使能技术",
+      "Y02P60": "农业、林业、畜牧业或农产品生产以外的工业生产减排技术"
+    }
+  },
+  "visual": {
+    "background": {
+      "darkColor": "#000000",
+      "lightColor": "#ffffff",
+      "initialMode": "dark"
+    },
+    "globe": {
+      "surfaceColorDark": "#000000",
+      "surfaceColorLight": "#ffffff",
+      "size": 150,
+      "autoRotateByDefault": true,
+      "stopAutoRotateOnUserMove": true,
+      "overlayOpacity": 0.2
+    },
+    "camera": {
+      "minZoom": 175,
+      "maxZoom": 2400,
+      "defaultZoom": 450,
+      "zoomSpeed": 1,
+      "zoomEase": 24,
+      "dragSpeed": 3,
+      "viewInitialZoom": {
+        "gridSphere": 450,
+        "gridmap": 450,
+        "towers": 900,
+        "productspace": 450,
+        "productspace3D": 600,
+        "productsphere": 360
+      },
+      "productFocusZoom": 100
+    },
+    "particles": {
+      "defaultSize": 30,
+      "nodeSize": 30
+    },
+    "flylines": {
+      "maxWidth": 8,
+      "minWidth": 1.2,
+      "maxParticleSize": 6,
+      "minParticleSize": 2
+    },
+    "technologyLinks": {
+      "maxWidth": 20,
+      "minWidth": 0.6,
+      "maxOpacity": 0.45,
+      "minOpacity": 0.12
+    },
+    "defaultView": "gridSphere",
+    "settingsUrl": "settings.json"
+  },
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8081,
+    "cacheSeconds": -1
+  }
+}

@@ -1,0 +1,143 @@
+<html>
+
+	<head>
+		<title>全球绿色技术专利可视化</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+		<META NAME="ROBOTS" CONTENT="NOINDEX, FOLLOW">
+		<meta charset="utf-8">
+		<link href="csslib/style.css" rel="stylesheet" type="text/css">
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC&family=Roboto:wght@300&display=swap" rel="stylesheet" type="text/css">
+		<link href="csslib/select2.css" rel="stylesheet" type="text/css">
+		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>
+	</head>
+
+	<body>
+
+		<div id="loading">绿色技术专利数据加载中……</div>
+		<div id="spinner"></div>
+
+		<div class="logobox" style="position: fixed; right: 10px; top: 10px;">
+			<img src="images/whusim_logo.png">
+		</div>
+		<div class="info">
+			项目作者<span class="bull">&bull;</span><a href="//github.com/Zeyu-Deng">邓泽宇 | 何金雨 | 林子稀</a><br/>
+			源代码<span class="bull">&bull;</span><a href="//github.com/Zeyu-Deng/Zeyu-Deng.github.io/tree/main/patent_globe">GitHub仓库</a><br/>
+			技术支持<span class="bull">&bull;</span><a href="//www.khronos.org/webgl/">WebGL</a></span><a href="//threejs.org">｜Three.js</a><br/>
+			数据支持<span class="bull">&bull;</span><a href="https://data.oecd.org/patent/green-technologies.htm">OECD 绿色专利数据库</a>
+		</div>
+
+		<div id="UI">
+
+			<div id="sideBar">
+
+				<div class="titlebox">
+					<div class="title">
+						<span style="font-size:46px">全球</span><br/>
+						<span style="font-size:36px">绿色技术</span><br/>
+						<span style="font-size:42px">专利</span><br/>
+						<span style="font-size:32px">可视化</span><br/>
+					</div>
+				</div>
+
+				<div class="separator">&nbsp;</div>
+
+				<div class="subtitle">
+					每一个亮点 代表 <span id="patentUnitLabel">100</span> 项专利
+				</div>
+
+				<div class="separator">&nbsp;</div>
+
+				<div id="countrySection">
+					<div class="selectionBox">
+						<select class="countrySelection"></select>
+					</div>
+				</div>
+
+				<div id="productSection">
+					<div class="productBox"></div>
+				</div>
+
+				<div class="separator">&nbsp;</div>
+
+				<div id="visualizations"></div>
+
+				<div class="separator">&nbsp;</div>
+
+				<div id="themeQuestion">显示模式</div>
+				<div id="fullscreen">全&emsp;屏&emsp;模&emsp;式</div>
+				<div id="showLabels">显&emsp;示&emsp;地&emsp;名</div>
+				<div id="contrastbutton">高&emsp;对&emsp;比&emsp;度</div>
+
+			</div>
+
+		</div>
+
+		<div id="atlasBox"></div>
+
+		<div id="countries" ></div>
+
+		<div id="bottomControls">
+			<div class="controlTitle">按绿色技术类别进行筛选</div>
+			<div id="categories"></div>
+			<div class="controlTitle">按时间进度进行查看</div>
+			<div id="timelineControls">
+				<span id="timelineLabel">1990-2023</span>
+				<input id="timelineSlider" type="range" min="1990" max="2023" value="2023" step="1">
+			</div>
+		</div>
+
+		<div id="pointer"></div>
+		<div id="productlabel"></div>
+
+		<div id="modeDescription"></div>
+
+		<div id="storyMode"></div>
+		<div id="storyPrompt" style="display:none"></div>
+
+		<div id="noWebGL" style="display:none">
+			<div id='description'>
+				全球绿色技术专利可视化平台通过交互式三维地球仪展示1990-2023年间各国绿色技术专利的地理分布与流转。<br/>
+				本项目需要 WebGL 支持，您当前的浏览器可能不兼容。<br/>
+				请访问 <a href='https://get.webgl.org/'>get.webgl.org</a> 以获取帮助。
+			</div>
+		</div>
+
+		<script type="x-shader/x-vertex" id="vertexshader">
+			attribute float size;
+			attribute vec3 customColor;
+			varying vec3 vColor;
+			void main() {
+				vColor = customColor;
+				vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+				gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+				gl_Position = projectionMatrix * mvPosition;
+			}
+		</script>
+		<script type="x-shader/x-fragment" id="fragmentshader">
+			uniform vec3 color;
+			uniform sampler2D texture;
+			varying vec3 vColor;
+			void main() {
+				gl_FragColor = vec4( color * vColor, 1.0 );
+				gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+			}
+		</script>
+
+		<script src="jslib/noWebGL.js"></script>
+		<script src="jslib/spin.js"></script>
+		<script src="jslib/THREE.FullScreen.js"></script>
+		<script src='jslib/THREEx.KeyboardState.js'></script>
+		<script src="jslib/UI.js"></script>
+		<script src="jslib/labels.js"></script>
+		<script src="jslib/cameraControls.js"></script>
+		<script src="jslib/ParticleLinks.js"></script>
+		<script src="jslib/URLparser.js"></script>
+		<script src="jslib/THREE.GeoJSON.js"></script>
+		<script src="data/anchors.js"></script>
+		<script src="jslib/script.js"></script>
+
+	</body>
+
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "zeyu-deng.github.io",
+  "version": "1.0.0",
+  "description": "_placeholder_",
+  "main": "index.js",
+  "scripts": {
+    "build:patent-globe-data": "node scripts/build_patent_globe_data.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zeyu-Deng/Zeyu-Deng.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Zeyu-Deng/Zeyu-Deng.github.io/issues"
+  },
+  "homepage": "https://github.com/Zeyu-Deng/Zeyu-Deng.github.io#readme",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
